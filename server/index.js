@@ -41,13 +41,15 @@ app.delete("/api/todos/delete/:id", async (req, res) => {
   }
 });
 
-app.put("/api/todos/update/:id", async (req, res) => {
+app.patch("/api/todos/update/:id", async (req, res) => {
   let { id } = req.params;
+  const update = { ...req.body };
 
   try {
-    await TaskModel.findOneAndUpdate({ _id: id, ...req.body });
+    await TaskModel.findOneAndUpdate({ _id: id }, update);
     res.status(200).send("task updated !");
   } catch (err) {
+    console.log(err);
     res.send("something went wrong");
   }
 });

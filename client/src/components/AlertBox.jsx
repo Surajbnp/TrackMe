@@ -11,14 +11,16 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 
-
-export default function AlertBox({iconColor, iconStyle}) {
+export default function AlertBox({ iconColor, iconStyle, msg, func }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
 
   return (
     <>
-      <button style={{background : iconColor, padding : '4px', borderRadius:'50%'}} onClick={onOpen}>
+      <button
+        style={{ background: iconColor, padding: "4px", borderRadius: "50%" }}
+        onClick={onOpen}
+      >
         {iconStyle}
       </button>
       <AlertDialog
@@ -31,17 +33,15 @@ export default function AlertBox({iconColor, iconStyle}) {
         <AlertDialogOverlay />
 
         <AlertDialogContent>
-          <AlertDialogHeader>Discard Changes?</AlertDialogHeader>
+          <AlertDialogHeader>{msg?.header}</AlertDialogHeader>
           <AlertDialogCloseButton />
-          <AlertDialogBody>
-            Are you sure you want to discard all of your notes? 44 words will be
-            deleted.
-          </AlertDialogBody>
+          <AlertDialogBody>{`${msg?.msg}
+          `}</AlertDialogBody>
           <AlertDialogFooter>
             <Button ref={cancelRef} onClick={onClose}>
               No
             </Button>
-            <Button colorScheme='red' ml={3}>
+            <Button colorScheme="red" ml={3} onClick={() => func(msg?.id)}>
               Yes
             </Button>
           </AlertDialogFooter>

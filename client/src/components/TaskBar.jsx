@@ -4,12 +4,66 @@ import { Box, Flex } from "@chakra-ui/react";
 import AlertBox from "../components/AlertBox";
 import { BiRefresh } from "react-icons/bi";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
+import { deleteTask, editTask, getData, updateTask } from "../redux/action";
+import { useDispatch } from "react-redux";
+import { EditModal } from "./EditModal";
 
-const TaskBar = ({ taskName, description, status, serial }) => {
+const TaskBar = ({ name, status, serial, _id }) => {
+  const dispatch = useDispatch();
+
+  let deleteMsg = {
+    header: "Want to make change",
+    msg: "Are you sure you want to delete your task ?",
+    id: _id,
+  };
+
+  let updateMsg = {
+    header: "Want to update",
+    msg: `Are you sure, you want to change status of your task ?`,
+    id: _id,
+  };
+
+  const handleDelete = (id) => {
+    if (id) {
+      dispatch(deleteTask(id)).then((res) => {
+        if (res.type === "DELETE_TASK_SUCCESS") {
+          dispatch(getData());
+        }
+      });
+    }
+  };
+
+  const handleUpdate = (id) => {
+    let payload = {
+      status: true,
+    };
+    if (status) {
+      payload.status = false;
+    } else {
+      payload.status = true;
+    }
+
+    dispatch(updateTask(id, payload)).then((res) => {
+      if (res.type === "UPDATE_TASK_SUCCESS") {
+        dispatch(getData());
+      }
+    });
+  };
+
+  const handleEdit = (id, payload) => {
+    if (id && payload) {
+      dispatch(editTask(id, payload)).then((res) => {
+        if (res.type === "EDIT_TASK_SUCCESS") {
+          dispatch(getData());
+        }
+      });
+    }
+  };
+
   return (
     <Box className={styles.bar}>
       <div>{`${serial}.`}</div>
-      <div>{taskName}</div>
+      <div>{name.length > 15 ? name.substring(0, 15) + "..." : name}</div>
       <div>
         {status ? (
           <span className={styles.completed}>Completed</span>
@@ -18,18 +72,25 @@ const TaskBar = ({ taskName, description, status, serial }) => {
         )}
       </div>
       <Box className={styles.icons}>
-          <AlertBox
-            iconColor={"#32CD30"}
-            iconStyle={<BiRefresh color="white" />}
-          />
-          <AlertBox
-            iconColor={"#145DA0"}
-            iconStyle={<AiFillEdit color="white" />}
-          />
-          <AlertBox
-            iconColor={"#BA0F30"}
-            iconStyle={<AiFillDelete color="white" />}
-          />
+        <AlertBox
+          msg={updateMsg}
+          func={handleUpdate}
+          iconColor={"#32CD30"}
+          iconStyle={<BiRefresh color="white" />}
+        />
+        <EditModal
+          name={name}
+          id={_id}
+          func={handleEdit}
+          iconColor={"#145DA0"}
+          iconStyle={<AiFillEdit color="white" />}
+        />
+        <AlertBox
+          msg={deleteMsg}
+          func={handleDelete}
+          iconColor={"#BA0F30"}
+          iconStyle={<AiFillDelete color="white" />}
+        />
       </Box>
     </Box>
   );
